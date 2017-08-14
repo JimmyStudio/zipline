@@ -71,7 +71,7 @@ class ContinuousFutureSessionBarReader(SessionBarReader):
 
                 partitions.append((sid, start, end, start_loc, end_loc))
 
-                if roll[-1] is not None:
+                if roll_date is not None:
                     start = sessions[end_loc + 1]
 
         for column in columns:
