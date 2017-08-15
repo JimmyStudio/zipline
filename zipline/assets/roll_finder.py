@@ -25,7 +25,7 @@ class RollFinder(with_metaclass(ABCMeta, object)):
     def _active_contract(self, oc, front, back, dt):
         raise NotImplementedError
 
-    def get_contract_center(self, root_symbol, dt, offset):
+    def _get_contract_center(self, root_symbol, dt, offset):
         """
         Parameters
         ----------
@@ -50,6 +50,9 @@ class RollFinder(with_metaclass(ABCMeta, object)):
             return front
         primary = self._active_contract(oc, front, back, session)
         return oc.contract_at_offset(primary, offset, session.value)
+
+    def get_contract_center(self, root_symbol, dt, offset):
+        return self._get_contract_center(root_symbol, dt, offset)
 
     def get_rolls(self, root_symbol, start, end, offset):
         """
@@ -76,7 +79,7 @@ class RollFinder(with_metaclass(ABCMeta, object)):
             is after the range.
         """
         oc = self.asset_finder.get_ordered_contracts(root_symbol)
-        front = self.get_contract_center(root_symbol, end, 0)
+        front = self._get_contract_center(root_symbol, end, 0)
         back = oc.contract_at_offset(front, 1, end.value)
         if back is not None:
             end_session = self.trading_calendar.minute_to_session_label(end)
@@ -226,3 +229,8 @@ class VolumeRollFinder(RollFinder):
             if back_vol > front_vol:
                 return back
         return front
+
+    def get_contract_center(self, root_symbol, dt, offset):
+        day = self.trading_calendar.day
+        rolls = self.get_rolls(root_symbol, dt, dt + (180 * day), offset)
+        return self.asset_finder.retrieve_asset(rolls[0][0])
