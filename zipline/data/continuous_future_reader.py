@@ -71,15 +71,8 @@ class ContinuousFutureSessionBarReader(SessionBarReader):
 
                 partitions.append((sid, start, end, start_loc, end_loc))
 
-                if end < end_date:
-                    # We haven't yet reached the end of the window, so push
-                    # the partition start to the following session for the
-                    # next partition.
+                if roll_date is not None:
                     start = sessions[end_loc + 1]
-                else:
-                    # We've reached the end of the window, so we've collected
-                    # all the necessary partitions.
-                    break
 
         for column in columns:
             if column != 'volume' and column != 'sid':
