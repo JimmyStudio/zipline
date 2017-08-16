@@ -989,7 +989,22 @@ def record_current_contract(algo, data):
         window = self.data_portal.get_history_window(
             [cf.sid],
             Timestamp('2016-01-29', tz='UTC'),
-            2, '1d', 'close', 'daily')
+            3, '1d', 'close', 'daily')
+
+        assert_almost_equal(
+            window.loc['2016-01-27', cf],
+            305021.44,
+            err_msg="")
+
+        assert_almost_equal(
+            window.loc['2016-01-28', cf],
+            305031.44,
+            err_msg="")
+
+        assert_almost_equal(
+            window.loc['2016-01-29', cf],
+            325041.44,
+            err_msg="")
 
     def test_history_close_session_skip_volume(self):
         cf = self.data_portal.asset_finder.create_continuous_future(
